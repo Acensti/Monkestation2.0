@@ -6,7 +6,6 @@
 #define NANO_JUMP_USE 30
 #define NANO_CHARGE_DELAY 15
 #define NANO_EMP_CHARGE_DELAY 45
-
 #define POWER_PUNCH "QQQ"
 #define FINISH_HIM "SSS"
 #define HEAD_EXPLOSION "SSSS"
@@ -96,7 +95,6 @@
 	name = "nano gloves"
 	desc = "These tactical gloves are built into a nanosuit and are fireproof and shock resistant. Property of CryNet Systems."
 	resistance_flags = INDESTRUCTIBLE | FIRE_PROOF | ACID_PROOF | FREEZE_PROOF
-	permeability_coefficient = 0.01
 	item_flags = DROPDEL
 
 /obj/item/clothing/gloves/combat/nano/equipped(mob/user, slot)
@@ -152,36 +150,44 @@
 	if(slot == ITEM_SLOT_EYES)
 		ADD_TRAIT(src, TRAIT_NODROP, CLOTHING_TRAIT)
 
-/obj/item/clothing/glasses/nano_gogrgles/ui_action_click(mob/user, action)
-	if(istype(action, /datum/action/item_action/nanosuit/goggletoggle))
-		nvgmode(user)
-		return TRUE
-	return FALSE
+/obj/item/clothing/glasses/nano_goggles/ui_action_click(mob/user, action)
+    if(istype(action, /datum/action/item_action/nanosuit/goggletoggle))
+        toggle_nvg(user)
+        return TRUE
+    return FALSE
 
+/obj/item/clothing/glasses/nano_goggles/proc/toggle_nvg(mob/user, forced = FALSE)
+    if(!ishuman(user) || user.glasses != src)
+        return
 
-/obj/item/clothing/glasses/nano_goggles/proc/nvgmode(mob/user, var/forced = FALSE)
-	var/mob/living/carbon/human/H = user
-	if(H.glasses != src)
-		return
-	if(!ishuman(user))
-		return
-	on = !on
-	to_chat(user, "<span class='[forced ? "warning":"notice"]'>[forced ? "The goggles turn":"You turn the goggles"] [on ? "on":"off"][forced ? "!":"."]</span>")
-	if(on)
-		darkness_view = 8
-		lighting_alpha = LIGHTING_PLANE_ALPHA_MOSTLY_INVISIBLE
-	else
-		darkness_view = 2
-		lighting_alpha = null
-	H.update_sight()
-	for(var/X in actions)
-		var/datum/action/A = X
-		A.update_icon()
+    on = !on
+    to_chat(user, span_notice("[forced ? "The goggles turn" : "You turn the goggles"] [on ? "on" : "off"][forced ? "!" : "."]"))
+
+    if(on)
+        set_lighting_cutoff_view(user, 8)
+        set_color_cutoffs(user, list(10, 20, 30))
+    else
+        set_lighting_cutoff_view(user, initial(user.lighting_cutoff))
+        set_color_cutoffs(user, null)
+
+    user.update_sight()
+    update_icon()
 
 /obj/item/clothing/glasses/nano_goggles/emp_act(severity)
-	..()
-	if(prob(33/severity))
-		nvgmode(loc,TRUE)
+    . = ..()
+    if(. && prob(33/severity))
+        toggle_nvg(loc, TRUE)
+
+/obj/item/clothing/glasses/nano_goggles/proc/set_lighting_cutoff_view(mob/user, new_cutoff)
+    user.lighting_cutoff = new_cutoff
+    user.update_sight()
+
+/obj/item/clothing/glasses/nano_goggles/proc/set_color_cutoffs(mob/user, list/new_cutoffs)
+    if(new_cutoffs)
+        user.color_cutoffs = new_cutoffs
+    else
+        user.color_cutoffs = null
+    user.update_sight()
 
 /obj/item/clothing/suit/space/hardsuit/nano
 	alternate_worn_icon = 'hippiestation/icons/mob/nanosuit.dmi'
@@ -402,133 +408,189 @@
 		return TRUE
 	return FALSE
 
-/obj/item/clothing/suit/space/hardsuit/nano/proc/toggle_mode(var/suitmode, var/forced = FALSE)
+/obj/item/clothing/suit/space/hardsuit/nano/proc/toggle_mode(suitmode, forced = FALSE)
+    if(!istype(user))
+        return
 
-	if(!shutdown && (forced || (cell?.charge && mode != suitmode)))
+    switch(suitmode)
+        if(NANO_ARMOR)
+            helmet.display_visor_message("Maximum Armor!")
+            if(CHANNEL_FOOTSTEPS in GLOB.used_sound_channels)
+                GLOB.used_sound_channels[CHANNEL_FOOTSTEPS] *= 1.5
+            block_chance = hacked ? 65 : 50
+            slowdown = initial(slowdown)
+            armor = armor.generate_new_with_specific(list(
+                melee = 40,
+                bullet = 40,
+                laser = 40,
+                energy = 45,
+                bomb = 90,
+                rad = 90
+            ))
+            if(helmet)
+                helmet.armor = helmet.armor.generate_new_with_specific(list(
+                    melee = 40,
+                    bullet = 40,
+                    laser = 40,
+                    energy = 45,
+                    bomb = 90,
+                    rad = 90
+                ))
+            user.filters = list()
+            animate(user, alpha = 255, time = 5)
+            user.remove_movespeed_modifier(NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
+            REMOVE_TRAIT(user, TRAIT_TACRELOAD, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_LIGHT_STEP, NANO_SPEED)
+            style.remove(user)
+            jetpack.full_speed = FALSE
 
-		mode = suitmode
+        if(NANO_CLOAK)
+            helmet.display_visor_message("Cloak Engaged!")
+            if(prob(hacked ? 15 : 2))
+                var/datum/effect_system/spark_spread/spark = new
+                spark.set_up(1, 1, src)
+                spark.start()
+            if(CHANNEL_FOOTSTEPS in GLOB.used_sound_channels)
+                GLOB.used_sound_channels[CHANNEL_FOOTSTEPS] *= (hacked ? 0.25 : 0.75)
+            visible_message(span_warning("[user] suddenly disappears!"), vision_distance = 3)
+            block_chance = initial(block_chance)
+            slowdown = 0.4
+            armor = armor.generate_new_with_specific(list(
+                melee = 40,
+                bullet = 40,
+                laser = 40,
+                energy = 45,
+                bomb = 70,
+                rad = 70
+            ))
+            if(helmet)
+                helmet.armor = helmet.armor.generate_new_with_specific(list(
+                    melee = 40,
+                    bullet = 40,
+                    laser = 40,
+                    energy = 45,
+                    bomb = 70,
+                    rad = 70
+                ))
+            user.filters = filter(type="blur", size=1)
+            animate(user, alpha = 40, time = 5/upgrademulti)
+            user.remove_movespeed_modifier(NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
+            REMOVE_TRAIT(user, TRAIT_TACRELOAD, NANO_SPEED)
+            ADD_TRAIT(user, TRAIT_LIGHT_STEP, NANO_SPEED)
+            style.remove(user)
+            jetpack.full_speed = FALSE
 
-		switch(suitmode)
+        if(NANO_SPEED)
+            helmet.display_visor_message("Maximum Speed!")
+            if(CHANNEL_FOOTSTEPS in GLOB.used_sound_channels)
+                GLOB.used_sound_channels[CHANNEL_FOOTSTEPS] *= 1.0
+            block_chance = initial(block_chance)
+            slowdown = initial(slowdown)
+            armor = armor.generate_new_with_specific(list(
+                melee = 25,
+                bullet = 25,
+                laser = 25,
+                energy = 45,
+                bomb = 70,
+                rad = 70
+            ))
+            if(helmet)
+                helmet.armor = helmet.armor.generate_new_with_specific(list(
+                    melee = 25,
+                    bullet = 25,
+                    laser = 25,
+                    energy = 45,
+                    bomb = 70,
+                    rad = 70
+                ))
+            user.adjustOxyLoss(-5)
+            user.adjustStaminaLoss(-20)
+            user.filters = filter(type="outline", size=0.1, color=rgb(255,255,224))
+            animate(user, alpha = 255, time = 5)
+            REMOVE_TRAIT(user, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
+            ADD_TRAIT(user, TRAIT_TACRELOAD, NANO_SPEED)
+            user.add_movespeed_modifier(NANO_SPEED, multiplicative_slowdown = hacked ? -1 : -0.25, override = TRUE, blacklisted_movetypes = (FLYING|FLOATING))
+            ADD_TRAIT(user, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_LIGHT_STEP, NANO_SPEED)
+            style.remove(user)
+            jetpack.full_speed = TRUE
 
-			if(NANO_ARMOR)
+        if(NANO_STRENGTH)
+            helmet.display_visor_message("Maximum Strength!")
+            if(CHANNEL_FOOTSTEPS in GLOB.used_sound_channels)
+                GLOB.used_sound_channels[CHANNEL_FOOTSTEPS] *= 1.0
+            block_chance = initial(block_chance)
+            style.teach(user, TRUE)
+            slowdown = initial(slowdown)
+            armor = armor.generate_new_with_specific(list(
+                melee = 40,
+                bullet = 40,
+                laser = 40,
+                energy = 45,
+                bomb = 70,
+                rad = 70
+            ))
+            if(helmet)
+                helmet.armor = helmet.armor.generate_new_with_specific(list(
+                    melee = 40,
+                    bullet = 40,
+                    laser = 40,
+                    energy = 45,
+                    bomb = 70,
+                    rad = 70
+                ))
+            user.filters = filter(type="outline", size=0.1, color=rgb(255,0,0))
+            animate(user, alpha = 255, time = 5)
+            ADD_TRAIT(user, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
+            user.remove_movespeed_modifier(NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_TACRELOAD, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_LIGHT_STEP, NANO_SPEED)
+            jetpack.full_speed = FALSE
 
-				helmet.display_visor_message("Maximum Armor!")
-				var/datum/component/footstep/FS = Wearer.GetComponent(/datum/component/footstep)
-				FS.volume = 1.5
-				block_chance = hacked ? 65 : 50 //65% block emagged, 50% normal
-				slowdown = initial(slowdown)
-				// Update the armor values for the hardsuit
-				armor = armor.generate_new_with_specific(list(
-					melee = 40,
-					bullet = 40,
-					laser = 40,
-					energy = 45,
-					bomb = 90,
-					rad = 90
-				))
-				if(helmet)
-					helmet.armor = helmet.armor.generate_new_with_specific(list(
-						melee = 40,
-						bullet = 40,
-						laser = 40,
-						energy = 45,
-						bomb = 90,
-						rad = 90
-					))
-				Wearer.filters = list()
-				animate(Wearer, alpha = 255, time = 5)
-				Wearer.remove_movespeed_modifier(NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
-				REMOVE_TRAIT(Wearer, TRAIT_TACRELOAD, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_LIGHT_STEP, NANO_SPEED)
-				style.remove(Wearer)
-				jetpack.full_speed = FALSE
+        if(NANO_NONE)
+            block_chance = initial(block_chance)
+            if(CHANNEL_FOOTSTEPS in GLOB.used_sound_channels)
+                GLOB.used_sound_channels[CHANNEL_FOOTSTEPS] *= 1.0
+            style.remove(user)
+            slowdown = initial(slowdown)
+            armor = armor.generate_new_with_specific(list(
+                melee = 40,
+                bullet = 40,
+                laser = 40,
+                energy = 45,
+                bomb = 70,
+                rad = 70
+            ))
+            if(helmet)
+                helmet.armor = helmet.armor.generate_new_with_specific(list(
+                    melee = 40,
+                    bullet = 40,
+                    laser = 40,
+                    energy = 45,
+                    bomb = 70,
+                    rad = 70
+                ))
+            user.filters = list()
+            animate(user, alpha = 255, time = 5)
+            REMOVE_TRAIT(user, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
+            user.remove_movespeed_modifier(NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_TACRELOAD, NANO_SPEED)
+            REMOVE_TRAIT(user, TRAIT_LIGHT_STEP, NANO_SPEED)
+            jetpack.full_speed = FALSE
 
-			if(NANO_CLOAK)
-				helmet.display_visor_message("Cloak Engaged!")
-				if(prob(hacked? 15: 2))
-					var/datum/effect_system/spark_spread/spark = new
-					spark.set_up(1, 1, src)
-					spark.start()
-				var/datum/component/footstep/FS = Wearer.GetComponent(/datum/component/footstep)
-				FS.volume = hacked ? 0.25 : 0.75 //upgrade module
-				visible_message("<span class='warning'>[Wearer] suddenly disappears!</span>", vision_distance = 3)
-				block_chance = initial(block_chance)
-				slowdown = 0.4 //cloaking makes us move slightly faster
-				armor = armor.setRating(melee = 40, bullet = 40, laser = 40, energy = 45, bomb = 70, rad = 70)
-				helmet.armor = helmet.armor.setRating(melee = 40, bullet = 40, laser = 40, energy = 45, bomb = 70, rad = 70)
-				Wearer.filters = filter(type="blur",size=1)
-				animate(Wearer, alpha = 40, time = 5/upgrademulti)
-				Wearer.remove_movespeed_modifier(NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
-				REMOVE_TRAIT(Wearer, TRAIT_TACRELOAD, NANO_SPEED)
-				ADD_TRAIT(Wearer, TRAIT_LIGHT_STEP, NANO_SPEED)
-				style.remove(Wearer)
-				jetpack.full_speed = FALSE
+    for(var/datum/action/action as anything in actions)
+        action.update_button_icon()
+    user.update_worn_suit()
+    user.update_mob_action_buttons()
+    update_icon()
 
-			if(NANO_SPEED)
-				helmet.display_visor_message("Maximum Speed!")
-				var/datum/component/footstep/FS = Wearer.GetComponent(/datum/component/footstep)
-				FS.volume = 1.0
-				block_chance = initial(block_chance)
-				slowdown = initial(slowdown)
-				armor = armor.setRating(melee = 25, bullet = 25, laser = 25, energy = 45, bomb = 70, rad = 70)
-				helmet.armor = helmet.armor.setRating(melee = 25, bullet = 25, laser = 25, energy = 45, bomb = 70, rad = 70)
-				Wearer.adjustOxyLoss(-5, 0)
-				Wearer.adjustStaminaLoss(-20)
-				Wearer.filters = filter(type="outline", size=0.1, color=rgb(255,255,224))
-				animate(Wearer, alpha = 255, time = 5)
-				REMOVE_TRAIT(Wearer, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
-				ADD_TRAIT(Wearer, TRAIT_TACRELOAD, NANO_SPEED)
-				Wearer.add_movespeed_modifier(NANO_SPEED, update=TRUE, priority=100, multiplicative_slowdown = hacked ? -1 : -0.25, override = TRUE, blacklisted_movetypes=(FLYING|FLOATING))
-				ADD_TRAIT(Wearer, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_LIGHT_STEP, NANO_SPEED)
-				style.remove(Wearer)
-				jetpack.full_speed = TRUE
 
-			if(NANO_STRENGTH)
-				helmet.display_visor_message("Maximum Strength!")
-				var/datum/component/footstep/FS = Wearer.GetComponent(/datum/component/footstep)
-				FS.volume = 1.0
-				block_chance = initial(block_chance)
-				style.teach(Wearer,TRUE)
-				slowdown = initial(slowdown)
-				armor = armor.setRating(melee = 40, bullet = 40, laser = 40, energy = 45, bomb = 70, rad = 70)
-				helmet.armor = helmet.armor.setRating(melee = 40, bullet = 40, laser = 40, energy = 45, bomb = 70, rad = 70)
-				Wearer.filters = filter(type="outline", size=0.1, color=rgb(255,0,0))
-				animate(Wearer, alpha = 255, time = 5)
-				ADD_TRAIT(Wearer, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
-				Wearer.remove_movespeed_modifier(NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_TACRELOAD, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_LIGHT_STEP, NANO_SPEED)
-				jetpack.full_speed = FALSE
-
-			if(NANO_NONE)
-				block_chance = initial(block_chance)
-				var/datum/component/footstep/FS = Wearer.GetComponent(/datum/component/footstep)
-				FS.volume = 1.0
-				style.remove(Wearer)
-				slowdown = initial(slowdown)
-				armor = armor.setRating(melee = 40, bullet = 40, laser = 40, energy = 45, bomb = 70, rad = 70)
-				helmet.armor = helmet.armor.setRating(melee = 40, bullet = 40, laser = 40, energy = 45, bomb = 70, rad = 70)
-				Wearer.filters = list()
-				animate(Wearer, alpha = 255, time = 5)
-				REMOVE_TRAIT(Wearer, TRAIT_PUSHIMMUNE, NANO_STRENGTH)
-				Wearer.remove_movespeed_modifier(NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_IGNORESLOWDOWN, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_TACRELOAD, NANO_SPEED)
-				REMOVE_TRAIT(Wearer, TRAIT_LIGHT_STEP, NANO_SPEED)
-				jetpack.full_speed = FALSE
-
-	for(var/X in actions)
-		var/datum/action/A = X
-		A.UpdateButtonIcon()
-	Wearer.update_inv_wear_suit()
-	Wearer.update_action_buttons_icon()
-	update_icon()
 
 /obj/item/clothing/suit/space/hardsuit/nano/ex_act(severity, severity)
 	. = ..()
@@ -960,64 +1022,76 @@
 	var/picked_hit_type = pick("punches", "kicks")
 	var/bonus_damage = 10
 	var/quick = FALSE
-	if(D.resting || D.lying)//we can hit ourselves
+
+	if(D.is_resting() || D.is_lying_down()) // we can hit ourselves
 		bonus_damage += 5
 		picked_hit_type = "stomps on"
-		if(A.zone_selected == BODY_ZONE_HEAD && D.get_bodypart(BODY_ZONE_HEAD) && (!A.resting || !A.lying))
+		if(A.zone_selected == BODY_ZONE_HEAD && D.get_bodypart(BODY_ZONE_HEAD) && (!A.is_resting() || !A.is_lying_down()))
 			D.add_splatter_floor(D.loc)
 			D.apply_damage(10, BRAIN)
 			bonus_damage += 5
 			if(D.health <= 40)
-				add_to_streak("S",D)
-				if(check_streak(A,D))
+				add_to_streak("S", D)
+				if(check_streak(A, D))
 					return TRUE
-	if(D != A && !D.stat && (!D.IsParalyzed() || !D.IsStun())) //and we can't knock ourselves the fuck out/down!
+
+	if(D != A && !D.is_dead() && (!D.is_paralyzed() || !D.is_stunned())) // and we can't knock ourselves the fuck out/down!
 		if(A.grab_state == GRAB_AGGRESSIVE)
-			A.stop_pulling() //So we don't spam the combo
+			A.stop_pulling() // So we don't spam the combo
 			bonus_damage += 5
 			D.Paralyze(15)
 			D.visible_message("<span class='warning'>[A] knocks [D] the fuck down!", \
 							"<span class='userdanger'>[A] knocks you the fuck down!</span>")
 			if(prob(75))
-				step_away(D,A,15)
+				step_away(D, A, 15)
 		else if(A.grab_state > GRAB_AGGRESSIVE)
 			var/atom/throw_target = get_edge_target_turf(D, A.dir)
 			if(!D.anchored)
-				D.throw_at(throw_target, rand(1,2), 7, A)
+				D.throw_at(throw_target, rand(1, 2), 7, A)
 			bonus_damage += 10
 			D.Paralyze(60)
 			D.visible_message("<span class='warning'>[A] knocks [D] the fuck out!!", \
 							"<span class='userdanger'>[A] knocks you the fuck out!!</span>")
-		else if(A.resting && !D.lying) //but we can't legsweep ourselves!
+		else if(A.is_resting() && !D.is_lying_down()) // but we can't legsweep ourselves!
 			D.visible_message("<span class='warning'>[A] leg sweeps [D]!", \
 								"<span class='userdanger'>[A] leg sweeps you!</span>")
 			playsound(get_turf(A), 'sound/effects/hit_kick.ogg', 50, TRUE, -1)
 			bonus_damage += 5
 			D.Paralyze(60)
 			log_combat(A, D, "nanosuit leg swept")
-	if(!A.resting || !A.lying)
+
+	if(!A.is_resting() || !A.is_lying_down())
 		if(prob(30))
 			quick = TRUE
 			A.changeNext_move(CLICK_CD_RAPID)
 			.= FALSE
-			add_to_streak("Q",D)
-			if(check_streak(A,D))
+			add_to_streak("Q", D)
+			if(check_streak(A, D))
 				return TRUE
 		else if(prob(35))
-			cleeve_attack(A,D)
+			cleeve_attack(A, D)
 			return FALSE
-	D.visible_message("<span class='danger'>[A] [quick?"quick":""] [picked_hit_type] [D]!</span>", \
-					"<span class='userdanger'>[A] [quick?"quick":""] [picked_hit_type] you!</span>")
+
+	D.visible_message("<span class='danger'>[A] [quick ? "quick" : ""] [picked_hit_type] [D]!</span>", \
+					"<span class='userdanger'>[A] [quick ? "quick" : ""] [picked_hit_type] you!</span>")
+
 	if(picked_hit_type == "kicks" || picked_hit_type == "stomps on")
 		A.do_attack_animation(D, ATTACK_EFFECT_KICK)
 		playsound(get_turf(D), 'sound/effects/hit_kick.ogg', 50, TRUE, -1)
 	else
 		A.do_attack_animation(D, ATTACK_EFFECT_PUNCH)
 		playsound(get_turf(D), 'sound/effects/hit_punch.ogg', 50, TRUE, -1)
+
 	log_combat(A, D, "attacked ([name])")
+
 	if(isalien(D))
 		bonus_damage += 30
-	D.apply_damage(bonus_damage, BRUTE)
+
+	// Apply damage using the new armor system
+	var/damage_type = BRUTE // or whatever damage type is appropriate
+	var/total_damage = bonus_damage
+	D.apply_damage(total_damage, damage_type)
+
 	return TRUE
 
 /datum/martial_art/nanosuit/disarm_act(var/mob/living/carbon/human/A, var/mob/living/carbon/D)
