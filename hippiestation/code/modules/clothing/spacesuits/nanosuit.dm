@@ -409,6 +409,7 @@
 	return FALSE
 
 /obj/item/clothing/suit/space/hardsuit/nano/proc/toggle_mode(suitmode, forced = FALSE)
+    var/mob/living/carbon/human/user = loc
     if(!istype(user))
         return
 
