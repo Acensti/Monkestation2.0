@@ -33,9 +33,9 @@
 [soft_ic]
 "server" = "This term is commonly considered OOC"
 [soft_ic]
-"lol" = ""This term is commonly considered OOC"
+"lol" = "This term is commonly considered OOC"
 [soft_ic]
-"lmao" = ""This term is commonly considered OOC"
+"lmao" = "This term is commonly considered OOC"
 
 # Anything in here will warn the player if said ICly *except* PDAs. the player must approve their message to send it
 [soft_ic_outside_pda]
