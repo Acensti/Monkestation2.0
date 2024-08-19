@@ -6,7 +6,6 @@
 [shared]
 "blockedinshared" = "blocked"
 "kys" = "blocked"
-"karma station 13" = "blocked"
 
 # Anything in here is blocked just from IC interactions, such as chat or names, but is allowed in dead chat and OOC
 [ic]
