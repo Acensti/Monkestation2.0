@@ -101,12 +101,22 @@ GLOBAL_LIST_INIT(message_modes_stat_limits, list(
 		return
 	if(client?.prefs?.read_preference(/datum/preference/toggle/streamer_mode))
 		message = filter_streamer_words(message)
+
+
+	if(client?.prefs?.read_preference(/datum/preference/toggle/language_translation))
+		var/translation_setting = client.prefs.read_preference(/datum/preference/choiced/language_translation)
+		if(translation_setting == "russian_to_english" || translation_setting == "both")
+			message = translate_russian_to_english(message)
+		else if(translation_setting == "english_to_russian" || translation_setting == "both")
+			message = translate_english_to_russian(message)
+
 	var/list/message_mods = list()
 	var/original_message = message
 	message = get_message_mods(message, message_mods)
 	saymode = SSradio.saymodes[message_mods[RADIO_KEY]]
 	if (!forced)
 		message = check_for_custom_say_emote(message, message_mods)
+
 
 	if(!message)
 		return
@@ -271,6 +281,8 @@ GLOBAL_LIST_INIT(message_modes_stat_limits, list(
 
 	return TRUE
 
+
+
 /mob/living/Hear(message, atom/movable/speaker, datum/language/message_language, raw_message, radio_freq, list/spans, list/message_mods = list(), message_range=0)
 	if((SEND_SIGNAL(src, COMSIG_MOVABLE_PRE_HEAR, args) & COMSIG_MOVABLE_CANCEL_HEARING) || !GET_CLIENT(src))
 		return FALSE
@@ -278,6 +290,14 @@ GLOBAL_LIST_INIT(message_modes_stat_limits, list(
 		return
 	if(client?.prefs?.read_preference(/datum/preference/toggle/streamer_mode))
 		raw_message = filter_streamer_words(raw_message)
+
+	//  translation logic 
+	if(client?.prefs?.read_preference(/datum/preference/toggle/language_translation))
+		var/translation_setting = client.prefs.read_preference(/datum/preference/choiced/language_translation)
+		if(translation_setting == "english_to_russian" || translation_setting == "both")
+			raw_message = translate_english_to_russian(raw_message)
+		else if(translation_setting == "russian_to_english" || translation_setting == "both")
+			raw_message = translate_russian_to_english(raw_message)
 	//monkestation edit
 	if(radio_freq && can_hear())
 		var/atom/movable/virtualspeaker/V = speaker
