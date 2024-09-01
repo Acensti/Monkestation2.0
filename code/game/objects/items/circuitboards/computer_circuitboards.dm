@@ -405,6 +405,11 @@
 	greyscale_colors = CIRCUIT_COLOR_SCIENCE
 	build_path = /obj/machinery/computer/scan_consolenew
 
+/obj/item/circuitboard/computer/bio_chamber
+	name = "Bio Chamber Console"
+	greyscale_colors = CIRCUIT_COLOR_SCIENCE
+	build_path = /obj/machinery/computer/bio_chamber
+
 /obj/item/circuitboard/computer/mechpad
 	name = "Mecha Orbital Pad Console"
 	greyscale_colors = CIRCUIT_COLOR_SCIENCE

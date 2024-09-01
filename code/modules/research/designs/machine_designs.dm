@@ -492,6 +492,16 @@
 	)
 	departmental_flags = DEPARTMENT_BITFLAG_SCIENCE
 
+/datum/design/board/bio_chamber
+	name = "Bio Chamber Console Board"
+	desc = "Allows for the construction of circuit boards used to build a Bio Chamber console."
+	id = "bio_chamber"
+	build_path = /obj/item/circuitboard/computer/bio_chamber
+	category = list(
+		RND_CATEGORY_MACHINE + RND_SUBCATEGORY_MACHINE_BIOENGINEERING
+	)
+	departmental_flags = DEPARTMENT_BITFLAG_SCIENCE
+
 /datum/design/board/destructive_scanner
 	name = "Destructive Scanner Board"
 	desc = "The circuit board for an experimental destructive scanner."

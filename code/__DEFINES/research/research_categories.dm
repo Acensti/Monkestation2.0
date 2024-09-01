@@ -68,6 +68,7 @@
 #define RND_SUBCATEGORY_MACHINE_TELEPORT "/Teleportation Machines"
 #define RND_SUBCATEGORY_MACHINE_ROBOTICS "/Robotics Machines"
 #define RND_SUBCATEGORY_MACHINE_GENETICS "/Genetics Machines"
+#define RND_SUBCATEGORY_MACHINE_BIOENGINEERING "/Bioengineering Machines"
 #define RND_SUBCATEGORY_MACHINE_FAB "/Fabricators"
 #define RND_SUBCATEGORY_MACHINE_SERVICE "/Service Machines"
 #define RND_SUBCATEGORY_MACHINE_TELECOMMS "/Telecommunications Machines"
