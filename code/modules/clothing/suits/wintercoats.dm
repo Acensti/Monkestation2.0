@@ -456,6 +456,18 @@
 	desc = "A white winter coat hood. It's warm."
 	icon_state = "hood_genetics"
 
+// Bioengineer
+/obj/item/clothing/suit/hooded/wintercoat/science/bioengineer
+	name = "bioengineering winter coat"
+	desc = "A white winter coat, smelling faintly of blood and chemicals."
+	icon_state = "coatgenetics" // TODO: Create a new icon for bioengineers
+	inhand_icon_state = null
+	hoodtype = /obj/item/clothing/head/hooded/winterhood/science/bioengineer
+
+/obj/item/clothing/head/hooded/winterhood/science/bioengineer
+	desc = "A white winter coat hood. You can pull it down over your eyes and pretend to be a mad scientist. It's warm."
+	icon_state = "hood_genetics" // TODO: Create a new icon for bioengineers
+
 // Station Engineer
 /obj/item/clothing/suit/hooded/wintercoat/engineering
 	name = "engineering winter coat"

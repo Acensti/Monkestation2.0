@@ -189,6 +189,12 @@
 	icon_state = "backpack-genetics"
 	inhand_icon_state = "genepack"
 
+/obj/item/storage/backpack/bioengineering
+	name = "bioengineering backpack"
+	desc = "A bag designed to be acid resistant and to help keep you safe from biohazards."
+	icon_state = "backpack-genetics" // TODO: Make a new icon
+	inhand_icon_state = "genepack" // TODO: Make a new icon
+
 /obj/item/storage/backpack/science
 	name = "science backpack"
 	desc = "A specially designed backpack. It's fire resistant and smells vaguely of plasma."
@@ -354,6 +360,12 @@
 	icon_state = "satchel-genetics"
 	inhand_icon_state = "satchel-gen"
 
+/obj/item/storage/backpack/satchel/bio
+	name = "bioengineer satchel"
+	desc = "A sterile satchel with bioengineer colours."
+	icon_state = "satchel-genetics" // TODO: Change to bioengineer when made
+	inhand_icon_state = "satchel-gen" // TODO: Change to bioengineer when made
+
 /obj/item/storage/backpack/satchel/science
 	name = "scientist satchel"
 	desc = "Useful for holding research materials."
@@ -486,6 +498,12 @@
 	desc = "A large duffel bag for holding extra genetic mutations."
 	icon_state = "duffel-genetics"
 	inhand_icon_state = "duffel-genetics"
+
+/obj/item/storage/backpack/duffelbag/bioengineer
+	name = "bioengineer's duffel bag"
+	desc = "A large duffel bag for holding extra organic materials."
+	icon_state = "duffel-genetics" // TODO: Change this to a bioengineer icon
+	inhand_icon_state = "duffel-genetics" // TODO: Change this to a bioengineer icon
 
 /obj/item/storage/backpack/duffelbag/science
 	name = "scientist's duffel bag"

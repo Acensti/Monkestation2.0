@@ -224,6 +224,7 @@
 		/datum/job/detective = /obj/item/organ/internal/lungs/cybernetic/tier3,
 		/datum/job/doctor = /obj/item/organ/internal/cyberimp/arm/item_set/surgery,
 		/datum/job/geneticist = /obj/item/organ/internal/fly, //we don't care about implants, we have cancer.
+		/datum/job/bioengineer = /obj/item/organ/internal/fly, // TODO: Change this to something relevant for bioengineers
 		/datum/job/head_of_personnel = /obj/item/organ/internal/eyes/robotic,
 		/datum/job/head_of_security = /obj/item/organ/internal/cyberimp/arm/item_set/combat, // monkestation edit: cybernetics overhaul (no more validhunt eyes, instead you get a shoddy stunprod in your arm)
 		/datum/job/janitor = /obj/item/organ/internal/cyberimp/arm/item_set/janitor, // monkestation edit: cybernetics overhaul (useful job stuff)

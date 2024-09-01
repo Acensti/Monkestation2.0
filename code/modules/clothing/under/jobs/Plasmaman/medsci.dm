@@ -34,6 +34,12 @@
 	icon_state = "geneticist_envirosuit"
 	inhand_icon_state = null
 
+/obj/item/clothing/under/plasmaman/bioengineer
+	name = "bioengineering plasma envirosuit"
+	desc = "A plasmaman envirosuit designed for bioengineers."
+	icon_state = "geneticist_envirosuit" // TODO: Add a new icon state for this
+	inhand_icon_state = null
+
 /obj/item/clothing/under/plasmaman/chemist
 	name = "chemistry plasma envirosuit"
 	desc = "A plasmaman envirosuit designed for chemists."

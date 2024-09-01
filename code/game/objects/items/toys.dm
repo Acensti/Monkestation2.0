@@ -1110,6 +1110,11 @@
 	icon_state = "geneticist"
 	toysay = "Smash!"
 
+/obj/item/toy/figure/bioengineer
+	name = "\improper Bioengineer action figure"
+	icon_state = "geneticist" // TODO: Change this to the bioengineer icon
+	toysay = "Evolution is a lie!"
+
 /obj/item/toy/figure/hop
 	name = "\improper Head of Personnel action figure"
 	icon_state = "hop"

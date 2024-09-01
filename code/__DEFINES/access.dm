@@ -117,6 +117,8 @@
 #define ACCESS_ORDNANCE_STORAGE "ordnance_storage"
 /// Access to the Genetics division of Science.
 #define ACCESS_GENETICS "genetics"
+/// Access to the Bioengineering division of Science.
+#define ACCESS_BIOENGINEERING "bioengineering"
 /// Access to the Robotics division of Science, as well as opening up silicon cyborgs and other simple robots.
 #define ACCESS_ROBOTICS "robotics"
 /// Access to the Xenobiology division of Science.
@@ -295,6 +297,7 @@
 	ACCESS_EVA, \
 	ACCESS_EXTERNAL_AIRLOCKS, \
 	ACCESS_GENETICS, \
+	ACCESS_BIOENGINEERING, \
 	ACCESS_HYDROPONICS, \
 	ACCESS_JANITOR, \
 	ACCESS_KITCHEN, \
@@ -460,6 +463,7 @@
 /// Used to seed the accesses_by_region list in SSid_access. A list of all research regional accesses that are overseen by the RD.
 #define REGION_ACCESS_RESEARCH list( \
 	ACCESS_GENETICS, \
+	ACCESS_BIOENGINEERING, \
 	ACCESS_MECH_SCIENCE, \
 	ACCESS_MINISAT, \
 	ACCESS_NETWORK, \
@@ -565,6 +569,7 @@
 	/obj/item/modular_computer/pda/atmos = list(REGION_ENGINEERING), \
 	/obj/item/modular_computer/pda/chemist = list(REGION_MEDBAY), \
 	/obj/item/modular_computer/pda/geneticist = list(REGION_RESEARCH), \
+	/obj/item/modular_computer/pda/bioengineer = list(REGION_RESEARCH), \
 	/obj/item/modular_computer/pda/quartermaster = list(REGION_SUPPLY), \
 )
 /// All regions that make up the station area. Helper define to quickly designate a region as part of the station or not. Access via SSid_access.station_regions.

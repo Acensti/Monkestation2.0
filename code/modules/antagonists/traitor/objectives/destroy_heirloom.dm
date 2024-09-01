@@ -55,6 +55,7 @@
 		/datum/job/cargo_technician,
 		// Science
 		/datum/job/geneticist,
+		/datum/job/bioengineer,
 		/datum/job/scientist,
 		/datum/job/roboticist,
 		// Engineering

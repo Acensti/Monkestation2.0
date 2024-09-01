@@ -701,7 +701,7 @@ GLOBAL_LIST_INIT(loadout_exosuits, generate_loadout_items(/datum/loadout_item/su
 /datum/loadout_item/suit/sci_jacket
 	name = "Science Jacket"
 	item_path = /obj/item/clothing/suit/toggle/jacket/sci
-	restricted_roles = list(JOB_SCIENTIST, JOB_GENETICIST, JOB_ROBOTICIST, JOB_RESEARCH_DIRECTOR)
+	restricted_roles = list(JOB_SCIENTIST, JOB_GENETICIST, JOB_BIOENGINEER, JOB_ROBOTICIST, JOB_RESEARCH_DIRECTOR)
 	requires_purchase = FALSE
 
 /datum/loadout_item/suit/med_jacket

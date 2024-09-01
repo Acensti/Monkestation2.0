@@ -258,6 +258,12 @@
 	icon_state = "geneticist_envirohelm"
 	inhand_icon_state = null
 
+/obj/item/clothing/head/helmet/space/plasmaman/bioengineer
+	name = "bioengineer's plasma envirosuit helmet"
+	desc = "A plasmaman envirohelmet designed for bioengineers."
+	icon_state = "geneticist_envirohelm" // TODO: Create a new icon for this
+	inhand_icon_state = null
+
 /obj/item/clothing/head/helmet/space/plasmaman/research_director
 	name = "research director's plasma envirosuit helmet"
 	desc = "A special containment helmet designed for the Research Director. A light brown design is applied to differentiate them from other scientists."
