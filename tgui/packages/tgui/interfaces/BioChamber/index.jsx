@@ -2,7 +2,7 @@ import { useBackend } from '../../backend';
 import { Box, Button, LabeledList, Section, Stack } from '../../components';
 import { Window } from '../../layouts';
 import { BioChamberMutation } from './BioChamberMutation';
-import { CONSOLE_MODE_MUTATION, CONSOLE_MODE_STORAGE } from './constants';
+import { CONSOLE_MODE_MUTATION } from './constants';
 
 export const BioChamber = (props) => {
   const { data } = useBackend();
@@ -16,7 +16,7 @@ export const BioChamber = (props) => {
             <BioChamberCommands />
           </Stack.Item>
           <Stack.Item grow>
-            {consoleMode === CONSOLE_MODE_STORAGE && <BioChamberMutation />}
+            {consoleMode === CONSOLE_MODE_MUTATION && <BioChamberMutation />}
           </Stack.Item>
         </Stack>
       </Window.Content>

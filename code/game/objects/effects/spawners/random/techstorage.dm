@@ -62,6 +62,7 @@
 		/obj/item/circuitboard/machine/nanite_programmer,
 		/obj/item/circuitboard/machine/nanite_program_hub,
 		/obj/item/circuitboard/computer/scan_consolenew,
+		/obj/item/circuitboard/computer/bio_chamber,
 		/obj/item/circuitboard/machine/dnascanner,
 		/obj/item/circuitboard/machine/dna_infuser,
 	)
