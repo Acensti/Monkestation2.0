@@ -1,101 +1,141 @@
 /obj/machinery/computer/bio_chamber
-	name = "Bio Chamber"
-	desc = "A machine for growing organs, or abominations."
-	icon_screen = "dna" // TODO: Replace with a new icon
-	icon_keyboard = "med_key" // TODO: Replace with a new icon
-	density = TRUE
-	circuit = /obj/item/circuitboard/computer/bio_chamber
+    name = "Bio Chamber"
+    desc = "A machine for growing organs, or abominations."
+    icon_screen = "dna"
+    icon_keyboard = "med_key"
+    density = TRUE
+    circuit = /obj/item/circuitboard/computer/bio_chamber
 
-	light_color = LIGHT_COLOR_FLARE
+    light_color = LIGHT_COLOR_FLARE
 
-	/// Link to the techweb's stored research. Used to retrieve stored mutations
-	var/datum/techweb/stored_research
-	/// List of all organs stored in the DNA Console
-	var/list/stored_organs = list()
+    var/datum/techweb/stored_research
+    var/list/stored_organs = list()
+    var/list/list/tgui_view_state = list()
+    var/list/mixing_chamber = list()
+    var/max_reagents = 3
+    var/mixing_potency = 0
+    var/obj/item/organ/active_organ
 
-	/// State of tgui view, i.e. which tab is currently active
-	var/list/list/tgui_view_state = list()
-
+/obj/machinery/computer/bio_chamber/Initialize()
+    . = ..()
+    set_default_state()
 
 /obj/machinery/computer/bio_chamber/attackby(obj/item/item, mob/user, params)
-	// Store organs in the console
-	if (istype(item, /obj/item/organ))
-		item.forceMove(src)
-		stored_organs += item
-		to_chat(user, span_notice("You insert [item]."))
-		return
-	return ..()
+    if(istype(item, /obj/item/organ))
+        insert_organ(item, user)
+        return
+    if(istype(item, /obj/item/reagent_containers))
+        add_reagent(item, user)
+        return
+    return ..()
+
+/obj/machinery/computer/bio_chamber/proc/insert_organ(obj/item/organ/O, mob/user)
+    if(active_organ)
+        to_chat(user, span_warning("There's already an organ in the chamber!"))
+        return
+    O.forceMove(src)
+    active_organ = O
+    to_chat(user, span_notice("You insert [O] into [src]."))
+
+/obj/machinery/computer/bio_chamber/proc/add_reagent(obj/item/reagent_containers/RC, mob/user)
+    if(length(mixing_chamber) >= max_reagents)
+        to_chat(user, span_warning("The mixing chamber is full!"))
+        return
+    if(!RC.reagents.total_volume)
+        to_chat(user, span_warning("[RC] is empty!"))
+        return
+    RC.reagents.trans_to(src, RC.reagents.total_volume)
+    mixing_chamber += RC.reagents.reagent_list
+    to_chat(user, span_notice("You add [RC] to the mixing chamber."))
+    update_mixing_potency()
 
 /obj/machinery/computer/bio_chamber/ui_interact(mob/user, datum/tgui/ui)
-	. = ..()
-	// Most of ui_interact is spent setting variables for passing to the tgui
-	//  interface.
-	// We can also do some general state processing here too as it's a good
-	//  indication that a player is using the console.
-
-	// Attempt to update tgui ui, open and update if needed.
-	ui = SStgui.try_update_ui(user, src, ui)
-	if(!ui)
-		ui = new(user, src, "BioChamber")
-		ui.open()
+    ui = SStgui.try_update_ui(user, src, ui)
+    if(!ui)
+        ui = new(user, src, "BioChamber")
+        ui.open()
 
 /obj/machinery/computer/bio_chamber/ui_data(mob/user)
-	var/list/data = list()
-
-	data["view"] = tgui_view_state
-	data["storage"] = list()
-
-	return data
+    var/list/data = list()
+    data["view"] = tgui_view_state
+    data["active_organ"] = active_organ ? list(
+        "name" = active_organ.name,
+        "desc" = active_organ.desc,
+        "radiation_level" = active_organ.radiation_level
+    ) : null
+    data["mixing_chamber"] = mixing_chamber
+    data["mixing_potency"] = mixing_potency
+    return data
 
 /obj/machinery/computer/bio_chamber/ui_act(action, list/params)
-	var/static/list/gene_letters = list("A", "T", "C", "G");
-	var/static/gene_letter_count = length(gene_letters)
+    . = ..()
+    if(.)
+        return
+    . = TRUE
+    switch(action)
+        if("set_view")
+            for (var/key in params)
+                if(key == "src")
+                    continue
+                tgui_view_state[key] = params[key]
+        if("start_irradiation")
+            irradiate_organ()
+        if("eject_organ")
+            eject_organ(usr)
+        if("clear_mixing_chamber")
+            mixing_chamber.Cut()
+            update_mixing_potency()
+    return FALSE
 
-	. = ..()
-	if(.)
-		return
+/obj/machinery/computer/bio_chamber/proc/eject_organ(mob/user)
+    if(!active_organ)
+        to_chat(user, span_warning("There's no organ in the chamber!"))
+        return
+    to_chat(user, span_notice("You remove [active_organ] from [src]."))
+    if(!user.put_in_active_hand(active_organ))
+        active_organ.forceMove(drop_location())
+    active_organ = null
 
-	. = TRUE
+/obj/machinery/computer/bio_chamber/proc/set_default_state()
+    tgui_view_state["consoleMode"] = "storage"
+    tgui_view_state["storageMode"] = "console"
 
-	add_fingerprint(usr)
-	usr.set_machine(src)
+/obj/machinery/computer/bio_chamber/proc/update_mixing_potency()
+    mixing_potency = 0
+    for(var/datum/reagent/R in mixing_chamber)
+        mixing_potency += R.volume * get_reagent_potency(R)
 
-	switch(action)
-		// Sets a new tgui view state
-		// ---------------------------------------------------------------------- //
-		// params["id"] - Key for the state to set
-		// params[...] - Every other element is used to set state variables
-		if("set_view")
-			for (var/key in params)
-				if(key == "src")
-					continue
-				tgui_view_state[key] = params[key]
-			return TRUE
+/obj/machinery/computer/bio_chamber/proc/get_reagent_potency(datum/reagent/R)
+    switch(R.type)
+        if(/datum/reagent/uranium)
+            return 2
+        if(/datum/reagent/toxin/plasma)
+            return 3
+        if(/datum/reagent/consumable/nutriment)
+            return 1
+    return 0.5
 
-	return FALSE
+/obj/machinery/computer/bio_chamber/proc/irradiate_organ()
+    if(!active_organ || !length(mixing_chamber))
+        return
+    var/radiation_level = 0
+    for(var/datum/reagent/R in mixing_chamber)
+        if(istype(R, /datum/reagent/uranium))
+            radiation_level += R.volume
+    if(radiation_level > 0)
+        active_organ.radiation_level += radiation_level
+        to_chat(usr, span_notice("The [active_organ] is exposed to radiation."))
+        check_mutation()
 
+/obj/machinery/computer/bio_chamber/proc/check_mutation()
+    if(!active_organ)
+        return
+    if(active_organ.radiation_level > 50)
+        mutate_organ()
 
-/**
- * Ejects the organ from the console.
-	*
-	* Will insert into the user's hand if possible, otherwise will drop it at the
-	* console's location.
-	*
-	* Arguments:
- * * user - The mob that is attempting to eject the organ.
- */
-/obj/machinery/computer/bio_chamber/proc/eject_organ(mob/user, obj/item/organ)
-	to_chat(user, span_notice("You remove [organ] from [src]."))
-
-	// If the organ shouldn't pop into the user's hand for any reason, drop it on the console instead.
-	if(!istype(user) || !Adjacent(user) || !user.put_in_active_hand(organ))
-		organ.forceMove(drop_location())
-
-/**
- * Sets the default state for the tgui interface.
- */
-/obj/machinery/computer/scan_consolenew/proc/set_default_state()
-	tgui_view_state["consoleMode"] = "storage"
-	tgui_view_state["storageMode"] = "console"
-	tgui_view_state["storageConsSubMode"] = "mutations"
-	tgui_view_state["storageDiskSubMode"] = "mutations"
+/obj/machinery/computer/bio_chamber/proc/mutate_organ()
+    if(istype(active_organ, /obj/item/organ/internal/heart))
+        active_organ.name = "irradiated heart"
+        active_organ.desc = "A heart that pulses with an eerie green glow."
+        // Add effects to the heart
+    // Add more organ types
