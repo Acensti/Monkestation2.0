@@ -530,6 +530,35 @@
 		)
 	job = /datum/job/geneticist
 
+// Olympus Edit Start
+/datum/id_trim/job/bioengineer
+	assignment = "Biomedical Engineer"
+	trim_state = "trim_bioengineer"
+	department_color = COLOR_SCIENCE_PINK
+	subdepartment_color = COLOR_MEDICAL_BLUE
+	sechud_icon_state = SECHUD_GENETICIST // TODO: Change to SECHUD_BIOENGINEER
+	minimal_access = list(
+		ACCESS_BIOENGINEERING,
+		ACCESS_MECH_SCIENCE,
+		ACCESS_MINERAL_STOREROOM,
+		ACCESS_MORGUE,
+		ACCESS_RESEARCH,
+		ACCESS_SCIENCE,
+		)
+	extra_access = list(
+		ACCESS_GENETICS,
+		ACCESS_ROBOTICS,
+		ACCESS_TECH_STORAGE,
+		ACCESS_XENOBIOLOGY,
+		)
+	template_access = list(
+		ACCESS_CAPTAIN,
+		ACCESS_CHANGE_IDS,
+		ACCESS_RD,
+		)
+	job = /datum/job/bioengineer
+// Olympus Edit End
+
 /datum/id_trim/job/head_of_personnel
 	assignment = "Head of Personnel"
 	intern_alt_name = "Head of Personnel-in-Training"
@@ -866,6 +895,7 @@
 		ACCESS_EVA,
 		ACCESS_GATEWAY,
 		ACCESS_GENETICS,
+		ACCESS_BIOENGINEERING, // Olympus edit
 		ACCESS_KEYCARD_AUTH,
 		ACCESS_NETWORK,
 		ACCESS_MAINT_TUNNELS,
@@ -915,6 +945,7 @@
 		)
 	extra_access = list(
 		ACCESS_GENETICS,
+		ACCESS_BIOENGINEERING, // Olympus edit
 		ACCESS_XENOBIOLOGY,
 		)
 	template_access = list(
@@ -942,6 +973,7 @@
 		)
 	extra_access = list(
 		ACCESS_GENETICS,
+		ACCESS_BIOENGINEERING, // Olympus edit
 		ACCESS_ROBOTICS,
 		)
 	template_access = list(
@@ -1068,6 +1100,7 @@
 	elevated_access = list(
 		ACCESS_AUX_BASE,
 		ACCESS_GENETICS,
+		ACCESS_BIOENGINEERING, // Olympus edit
 		ACCESS_ORDNANCE_STORAGE,
 		ACCESS_ORDNANCE,
 		ACCESS_ROBOTICS,

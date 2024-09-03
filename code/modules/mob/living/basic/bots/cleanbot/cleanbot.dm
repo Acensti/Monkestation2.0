@@ -69,10 +69,12 @@
 		JOB_ROBOTICIST = "M.S.",
 		JOB_SCIENTIST = "B.S.",
 		JOB_GENETICIST = "Gene B.S.",
+		JOB_BIOENGINEER = "Bio B.S.",
 	)
 	///which job titles should be placed after the name?
 	var/static/list/suffix_job_titles = list(
 		JOB_GENETICIST,
+		JOB_BIOENGINEER,
 		JOB_ROBOTICIST,
 		JOB_SCIENTIST,
 	)

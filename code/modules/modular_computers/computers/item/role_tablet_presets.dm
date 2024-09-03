@@ -197,6 +197,14 @@
 		/datum/computer_file/program/records/medical,
 	)
 
+/obj/item/modular_computer/pda/bioengineer
+	name = "bioengineer PDA"
+	greyscale_config = /datum/greyscale_config/tablet/stripe_split
+	greyscale_colors = "#FAFAFA#000099#0097CA" // TODO: Change to new colors
+	starting_programs = list(
+		/datum/computer_file/program/records/medical, // TODO: Create a new program for bioengineers?
+	)
+
 /**
  * Medical
  */

@@ -51,6 +51,7 @@
 		/datum/job/virologist,
 		// Science
 		/datum/job/geneticist,
+		/datum/job/bioengineer,
 		/datum/job/roboticist,
 		/datum/job/scientist,
 		// Service

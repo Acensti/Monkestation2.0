@@ -100,6 +100,7 @@ GLOBAL_LIST_INIT(vox_sounds, list("abduction" = 'sound/vox_fem/abduction.ogg',
 "beside" = 'sound/vox_fem/beside.ogg',
 "beware" = 'sound/vox_fem/beware.ogg',
 "beyond" = 'sound/vox_fem/beyond.ogg',
+// TODO: Add a bioengineer vox sound
 "biohazard" = 'sound/vox_fem/biohazard.ogg',
 "biological" = 'sound/vox_fem/biological.ogg',
 "birdwell" = 'sound/vox_fem/birdwell.ogg',

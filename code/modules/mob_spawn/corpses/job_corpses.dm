@@ -21,6 +21,11 @@
 	outfit = /datum/outfit/job/geneticist
 	icon_state = "corpsescientist"
 
+/obj/effect/mob_spawn/corpse/human/bioengineer
+	name = JOB_BIOENGINEER
+	outfit = /datum/outfit/job/bioengineer
+	icon_state = "corpsescientist"
+
 /obj/effect/mob_spawn/corpse/human/engineer
 	name = JOB_STATION_ENGINEER
 	outfit = /datum/outfit/job/engineer/gloved

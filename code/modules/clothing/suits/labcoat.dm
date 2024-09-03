@@ -67,6 +67,11 @@
 	desc = "A suit that protects against minor chemical spills. Has a blue stripe on the shoulder."
 	icon_state = "labcoat_gen"
 
+/obj/item/clothing/suit/toggle/labcoat/bioengineer
+	name = "bioengineer labcoat"
+	desc = "A suit that protects against acidic spills. Has a red stripe on the shoulder."
+	icon_state = "labcoat_gen" // TODO: Add a new icon state for this
+
 /obj/item/clothing/suit/toggle/labcoat/chemist
 	name = "chemist labcoat"
 	desc = "A suit that protects against minor chemical spills. Has an orange stripe on the shoulder."

@@ -91,6 +91,13 @@
 	gloves = /obj/item/clothing/gloves/color/plasmaman/white
 	head = /obj/item/clothing/head/helmet/space/plasmaman/genetics
 
+/datum/outfit/plasmaman/bioengineering
+	name = "Bioengineering Plasmaman"
+
+	uniform = /obj/item/clothing/under/plasmaman/bioengineer
+	gloves = /obj/item/clothing/gloves/color/plasmaman/white
+	head = /obj/item/clothing/head/helmet/space/plasmaman/bioengineer
+
 /datum/outfit/plasmaman/engineering
 	name = "Engineering Plasmaman"
 
