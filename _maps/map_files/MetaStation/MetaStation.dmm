@@ -54313,7 +54313,6 @@
 	name = "Engineering Security Doors"
 	},
 /obj/effect/turf_decal/caution/stand_clear,
-/obj/machinery/incident_display/delam/directional/north,
 /turf/open/floor/iron/dark,
 /area/station/engineering/break_room)
 "tcx" = (
@@ -61575,7 +61574,10 @@
 /turf/open/floor/iron,
 /area/station/hallway/primary/central)
 "vIT" = (
-/obj/machinery/shower/directional/west,
+/obj/machinery/shower/directional/west{
+	pixel_x = 16;
+	pixel_y = 0
+	},
 /obj/effect/turf_decal/stripes/line{
 	dir = 5
 	},
